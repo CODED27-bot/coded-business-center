@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CODED INT'L Business Center | Your Digital Solutions Hub</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        /* ===== CSS Variables - Design System ===== */
+        :root {
+            --charcoal: #1a1a1a;
+            --charcoal-light: #2a2a2a;
+            --charcoal-dark: #0a0a0a;
+            --gold: #d4a017;
+            --gold-light: #f59e0b;
+            --gold-bright: #ffb800;
+            --white: #ffffff;
+            --white-dim: rgba(255, 255, 255, 0.7);
+            --white-faint: rgba(255, 255, 255, 0.1);
+            --font-heading: 'Playfair Display', serif;
+            --font-body: 'Inter', sans-serif;
+            --easing-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+            --easing-bounce: cubic-bezier(0.34, 1.56, 0.64, 1);
+            --easing-elastic: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: var(--font-body);
+            background: var(--charcoal-dark);
+            color: var(--white);
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ===== Background Layers ===== */
+        .bg-mesh {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(ellipse at 20% 50%, rgba(212, 160, 23, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(245, 158, 11, 0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 80%, rgba(212, 160, 23, 0.05) 0%, transparent 50%),
+                linear-gradient(135deg, var(--charcoal-dark) 0%, var(--charcoal) 50%, var(--charcoal-dark) 100%);
+            z-index: 1;
+        }
+
+        /* Circuit Grid Pattern */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(212, 160, 23, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(212, 160, 23, 0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 2;
+            animation: gridPulse 8s ease-in-out infinite;
+        }
+
+        @keyframes gridPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.6; }
+        }
+
+        /* Canvas for particles and bokeh */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* ===== Main Content Container ===== */
+        .content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        /* ===== Logo - CODED ===== */
+        .logo-container {
+            margin-bottom: 1.5rem;
+            perspective: 1000px;
+        }
+
+        .logo-text {
+            font-family: var(--font-heading);
+            font-size: clamp(4rem, 12vw, 9rem);
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            display: inline-block;
+            position: relative;
+        }
+
+        .logo-letter {
+            display: inline-block;
+            opacity: 0;
+            transform: translateY(60px) rotateX(-20deg);
+            background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 40%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: drop-shadow(0 0 30px rgba(245, 158, 11, 0.4)) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+            animation: letterReveal 0.8s var(--easing-elastic) forwards;
+            position: relative;
+        }
+
+        /* Shimmer effect on letters */
+        .logo-letter::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+            animation-delay: calc(var(--letter-index, 0) * 0.1s + 2s);
+        }
+
+        @keyframes shimmer {
+            0%, 100% { left: -100%; }
+            50% { left: 200%; }
+        }
+
+        @keyframes letterReveal {
+            0% {
+                opacity: 0;
+                transform: translateY(60px) rotateX(-20deg) scale(0.8);
+                filter: blur(10px);
+            }
+            60% {
+                filter: blur(2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) rotateX(0deg) scale(1);
+                filter: blur(0) drop-shadow(0 0 30px rgba(245, 158, 11, 0.4)) drop-shadow(0 4px 20px rgba(0, 0, 0, 0.5));
+            }
+        }
+
+        /* 3D Depth layers for logo */
+        .logo-text::before {
+            content: 'CODED';
+            position: absolute;
+            top: 3px;
+            left: 3px;
+            width: 100%;
+            height: 100%;
+            background: rgba(212, 160, 23, 0.15);
+            -webkit-text-fill-color: rgba(212, 160, 23, 0.15);
+            filter: blur(8px);
+            z-index: -1;
+            animation: depthPulse 3s ease-in-out infinite;
+        }
+
+        .logo-text::after {
+            content: 'CODED';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold-bright) 0%, var(--gold) 40%, var(--gold-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            opacity: 0;
+            animation: glitchEffect 4s ease-in-out infinite;
+            animation-delay: 3s;
+        }
+
+        @keyframes depthPulse {
+            0%, 100% { 
+                filter: blur(8px); 
+                opacity: 0.5;
+                transform: translate(3px, 3px);
+            }
+            50% { 
+                filter: blur(12px); 
+                opacity: 0.8;
+                transform: translate(4px, 4px);
+            }
+        }
+
+        @keyframes glitchEffect {
+            0%, 92%, 100% { 
+                opacity: 0; 
+                transform: translate(0) skewX(0deg);
+            }
+            93% { 
+                opacity: 0.4; 
+                transform: translate(-3px, 1px) skewX(-5deg);
+            }
+            94% { 
+                opacity: 0; 
+                transform: translate(0) skewX(0deg);
+            }
+            95% { 
+                opacity: 0.3; 
+                transform: translate(2px, -1px) skewX(3deg);
+            }
+            96% { 
+                opacity: 0; 
+                transform: translate(0) skewX(0deg);
+            }
+        }
+
+        /* ===== Subtitle - INT'L Business Center ===== */
+        .subtitle {
+            font-family: var(--font-heading);
+            font-size: clamp(1.2rem, 3vw, 2rem);
+            font-weight: 500;
+            color: var(--white-dim);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeSlideUp 1s var(--easing-smooth) forwards;
+            animation-delay: 1.2s;
+            margin-bottom: 1rem;
+        }
+
+        /* ===== Tagline ===== */
+        .tagline {
+            font-family: var(--font-body);
+            font-size: clamp(1rem, 2vw, 1.3rem);
+            font-weight: 300;
+            color: var(--gold);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            opacity: 0;
+            filter: blur(10px);
+            animation: blurFocus 1.2s var(--easing-smooth) forwards;
+            animation-delay: 1.8s;
+            margin-bottom: 0.8rem;
+        }
+
+        @keyframes blurFocus {
+            0% {
+                opacity: 0;
+                filter: blur(15px);
+                transform: scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                filter: blur(0);
+                transform: scale(1);
+            }
+        }
+
+        /* ===== Services List ===== */
+        .services {
+            font-family: var(--font-body);
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            font-weight: 400;
+            color: var(--white-dim);
+            letter-spacing: 0.1em;
+            opacity: 0;
+            animation: fadeIn 1s var(--easing-smooth) forwards;
+            animation-delay: 2.4s;
+            margin-bottom: 2.5rem;
+        }
+
+        .services .dot {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: var(--gold);
+            border-radius: 50%;
+            margin: 0 0.5rem;
+            vertical-align: middle;
+            animation: dotPulse 2s ease-in-out infinite;
+        }
+
+        .services .dot:nth-child(2) { animation-delay: 0.3s; }
+        .services .dot:nth-child(3) { animation-delay: 0.6s; }
+        .services .dot:nth-child(4) { animation-delay: 0.9s; }
+
+        @keyframes dotPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.5); }
+        }
+
+        /* ===== CTA Button ===== */
+        .cta-container {
+            opacity: 0;
+            animation: fadeIn 1s var(--easing-smooth) forwards;
+            animation-delay: 3s;
+        }
+
+        .cta-button {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 1rem 2.5rem;
+            font-family: var(--font-body);
+            font-size: clamp(0.9rem, 1.5vw, 1rem);
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--charcoal-dark);
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-light) 100%);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.4s var(--easing-smooth);
+            box-shadow: 
+                0 0 20px rgba(245, 158, 11, 0.3),
+                0 0 40px rgba(245, 158, 11, 0.1),
+                0 4px 15px rgba(0, 0, 0, 0.3);
+            animation: buttonPulse 2.5s ease-in-out infinite;
+        }
+
+        @keyframes buttonPulse {
+            0%, 100% { 
+                box-shadow: 
+                    0 0 20px rgba(245, 158, 11, 0.3),
+                    0 0 40px rgba(245, 158, 11, 0.1),
+                    0 4px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(1);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 30px rgba(245, 158, 11, 0.5),
+                    0 0 60px rgba(245, 158, 11, 0.2),
+                    0 4px 15px rgba(0, 0, 0, 0.3);
+                transform: scale(1.02);
+            }
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px) scale(1.05);
+            box-shadow: 
+                0 0 40px rgba(245, 158, 11, 0.6),
+                0 0 80px rgba(245, 158, 11, 0.3),
+                0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .cta-button:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .cta-button .arrow {
+            transition: transform 0.3s var(--easing-smooth);
+        }
+
+        .cta-button:hover .arrow {
+            transform: translateX(5px);
+        }
+
+        /* Button shine effect */
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.6s var(--easing-smooth);
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        /* ===== Curtain Transition ===== */
+        .curtain {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 100%);
+            z-index: 100;
+            transform: scaleX(0);
+            transform-origin: left;
+            pointer-events: none;
+        }
+
+        .curtain.active {
+            animation: curtainWipe 0.8s var(--easing-smooth) forwards;
+        }
+
+        @keyframes curtainWipe {
+            0% { transform: scaleX(0); transform-origin: left; }
+            100% { transform: scaleX(1); transform-origin: left; }
+        }
+
+        /* ===== Fade In Keyframes ===== */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== Decorative Elements ===== */
+        .decorative-line {
+            width: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 0 auto;
+            opacity: 0;
+            animation: lineGrow 1s var(--easing-smooth) forwards;
+            animation-delay: 2s;
+        }
+
+        @keyframes lineGrow {
+            from { width: 0; opacity: 0; }
+            to { width: 200px; opacity: 0.5; }
+        }
+
+        /* ===== Responsive Design ===== */
+        @media (max-width: 768px) {
+            .content {
+                padding: 1.5rem;
+            }
+
+            .logo-text {
+                letter-spacing: 0.02em;
+            }
+
+            .subtitle {
+                letter-spacing: 0.1em;
+                margin-bottom: 0.8rem;
+            }
+
+            .tagline {
+                letter-spacing: 0.2em;
+                margin-bottom: 0.6rem;
+            }
+
+            .services {
+                font-size: 0.85rem;
+                margin-bottom: 2rem;
+            }
+
+            .cta-button {
+                padding: 0.9rem 2rem;
+                font-size: 0.85rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .content {
+                padding: 1rem;
+            }
+
+            .subtitle {
+                font-size: 1rem;
+            }
+
+            .tagline {
+                font-size: 0.85rem;
+            }
+
+            .services {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* ===== Reduced Motion ===== */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .logo-letter {
+                opacity: 1;
+                transform: none;
+                animation: none;
+            }
+
+            .curtain.active {
+                animation: none;
+                transform: scaleX(1);
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Layers -->
+    <div class="bg-mesh" aria-hidden="true"></div>
+    <div class="bg-grid" aria-hidden="true"></div>
+    <canvas id="particleCanvas" aria-hidden="true"></canvas>
+
+    <!-- Curtain Transition -->
+    <div class="curtain" id="curtain" aria-hidden="true"></div>
+
+    <!-- Main Content -->
+    <main class="content">
+        <!-- Logo -->
+        <div class="logo-container">
+            <h1 class="logo-text" aria-label="CODED">
+                <span class="logo-letter" style="--letter-index: 0;">C</span>
+                <span class="logo-letter" style="--letter-index: 1;">O</span>
+                <span class="logo-letter" style="--letter-index: 2;">D</span>
+                <span class="logo-letter" style="--letter-index: 3;">E</span>
+                <span class="logo-letter" style="--letter-index: 4;">D</span>
+            </h1>
+        </div>
+
+        <!-- Subtitle -->
+        <h2 class="subtitle">INT'L Business Center</h2>
+
+        <!-- Decorative Line -->
+        <div class="decorative-line" aria-hidden="true"></div>
+
+        <!-- Tagline -->
+        <p class="tagline">Your Digital Solutions Hub</p>
+
+        <!-- Services -->
+        <p class="services">
+            Printing
+            <span class="dot" aria-hidden="true"></span>
+            Graphics
+            <span class="dot" aria-hidden="true"></span>
+            Video Editing
+            <span class="dot" aria-hidden="true"></span>
+            Online Services
+        </p>
+
+        <!-- CTA Button -->
+        <div class="cta-container">
+            <button class="cta-button" id="enterButton" onclick="enterSite()" aria-label="Enter CODED INT'L Business Center website">
+                Enter Site
+                <span class="arrow" aria-hidden="true">→</span>
+            </button>
+        </div>
+    </main>
+
+    <script>
+        // ===== Particle System =====
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let particles = [];
+        let bokehOrbs = [];
+        let animationId;
+
+        // Resize canvas
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            initParticles();
+            initBokeh();
+        });
+
+        // Particle class for rising gold particles
+        class Particle {
+            constructor() {
+                this.reset();
+                this.y = Math.random() * canvas.height; // Start at random position
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 100;
+                this.size = Math.random() * 2 + 0.5;
+                this.speed = Math.random() * 0.5 + 0.2;
+                this.opacity = Math.random() * 0.5 + 0.1;
+                this.opacitySpeed = Math.random() * 0.002 + 0.001;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = Math.random() * 0.02 + 0.01;
+                this.wobbleDistance = Math.random() * 30 + 10;
+            }
+
+            update() {
+                this.y -= this.speed;
+                this.wobble += this.wobbleSpeed;
+                this.x += Math.sin(this.wobble) * 0.3;
+                this.opacity += this.opacitySpeed;
+
+                if (this.opacity > 0.6 || this.y < -10) {
+                    this.opacitySpeed = -Math.abs(this.opacitySpeed);
+                }
+                if (this.opacity < 0.05) {
+                    this.opacitySpeed = Math.abs(this.opacitySpeed);
+                }
+
+                if (this.y < -10) {
+                    this.reset();
+                }
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(245, 158, 11, ${this.opacity})`;
+                ctx.fill();
+
+                // Glow effect
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size * 3, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(245, 158, 11, ${this.opacity * 0.1})`;
+                ctx.fill();
+            }
+        }
+
+        // Bokeh orb class for floating background orbs
+        class BokehOrb {
+            constructor() {
+                this.reset();
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+            }
+
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 80 + 40;
+                this.speed = Math.random() * 0.15 + 0.05;
+                this.opacity = Math.random() * 0.03 + 0.01;
+                this.wobble = Math.random() * Math.PI * 2;
+                this.wobbleSpeed = Math.random() * 0.005 + 0.002;
+                this.wobbleDistance = Math.random() * 50 + 20;
+            }
+
+            update() {
+                this.y -= this.speed;
+                this.wobble += this.wobbleSpeed;
+                this.x += Math.sin(this.wobble) * 0.2;
+
+                if (this.y < -this.size * 2) {
+                    this.reset();
+                    this.y = canvas.height + this.size;
+                }
+            }
+
+            draw() {
+                const gradient = ctx.createRadialGradient(
+                    this.x, this.y, 0,
+                    this.x, this.y, this.size
+                );
+                gradient.addColorStop(0, `rgba(212, 160, 23, ${this.opacity})`);
+                gradient.addColorStop(0.5, `rgba(245, 158, 11, ${this.opacity * 0.5})`);
+                gradient.addColorStop(1, 'rgba(245, 158, 11, 0)');
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        // Initialize particles
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.min(Math.floor(canvas.width * canvas.height / 15000), 100);
+            for (let i = 0; i < particleCount; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        // Initialize bokeh orbs
+        function initBokeh() {
+            bokehOrbs = [];
+            const orbCount = Math.min(Math.floor(canvas.width * canvas.height / 30000), 15);
+            for (let i = 0; i < orbCount; i++) {
+                bokehOrbs.push(new BokehOrb());
+            }
+        }
+
+        // Animation loop
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw bokeh orbs (background)
+            bokehOrbs.forEach(orb => {
+                orb.update();
+                orb.draw();
+            });
+
+            // Draw particles (foreground)
+            particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+
+            animationId = requestAnimationFrame(animate);
+        }
+
+        // Start animation
+        initParticles();
+        initBokeh();
+        animate();
+
+        // ===== Enter Site Function =====
+        function enterSite() {
+            const curtain = document.getElementById('curtain');
+            const button = document.getElementById('enterButton');
+
+            // Add click effect
+            button.style.transform = 'scale(0.95)';
+
+            // Trigger curtain animation
+            curtain.classList.add('active');
+
+            // Redirect after curtain animation
+            setTimeout(() => {
+                window.location.href = './coded-business-center.html';
+            }, 900);
+        }
+
+        // ===== Mouse Parallax Effect (subtle) =====
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+            mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
+        });
+
+        function parallaxEffect() {
+            targetX += (mouseX - targetX) * 0.05;
+            targetY += (mouseY - targetY) * 0.05;
+
+            const content = document.querySelector('.content');
+            content.style.transform = `translate(${targetX * 10}px, ${targetY * 10}px)`;
+
+            requestAnimationFrame(parallaxEffect);
+        }
+
+        parallaxEffect();
+
+        // ===== Intersection Observer for entrance animations =====
+        // Ensure animations restart on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Add entrance class to body after a short delay
+            setTimeout(() => {
+                document.body.classList.add('loaded');
+            }, 100);
+        });
+
+        // ===== Performance optimization =====
+        // Pause animation when tab is not visible
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                cancelAnimationFrame(animationId);
+            } else {
+                animate();
+            }
+        });
+    </script>
+</body>
+</html>
